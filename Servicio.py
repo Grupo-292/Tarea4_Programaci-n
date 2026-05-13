@@ -1,202 +1,193 @@
-# ======================================================
+# =========================================================
 # ARCHIVO: servicio.py
-# Sistema de Gestión - Software FJ
-# ======================================================
+# =========================================================
 
 from abc import ABC, abstractmethod
 
-# ======================================================
+# =========================================================
 # EXCEPCIÓN PERSONALIZADA
-# ======================================================
+# =========================================================
 
 class ErrorServicio(Exception):
 
-    """
-    Controla errores relacionados
-    con los servicios.
-    """
-
     pass
 
-
-# ======================================================
-# CLASE ABSTRACTA SERVICIO
-# ======================================================
+# =========================================================
+# CLASE ABSTRACTA
+# =========================================================
 
 class Servicio(ABC):
 
-    """
-    Clase abstracta base para todos
-    los servicios del sistema.
-    """
-
     def __init__(
         self,
         nombre_servicio,
-        tarifa_base
+        costo_base
     ):
 
-        if tarifa_base <= 0:
+        if not nombre_servicio.strip():
 
             raise ErrorServicio(
-                "La tarifa debe ser mayor a cero."
+                "El nombre del servicio es obligatorio."
+            )
+
+        if costo_base <= 0:
+
+            raise ErrorServicio(
+                "El costo debe ser mayor a cero."
             )
 
         self.nombre_servicio = nombre_servicio
-        self.tarifa_base = tarifa_base
+        self.costo_base = costo_base
 
-    # ----------------------------------------------
-
-    @abstractmethod
-    def calcular_valor(self):
-        pass
-
-    # ----------------------------------------------
+    # =====================================================
 
     @abstractmethod
-    def detalle_servicio(self):
+    def calcular_costo(self):
         pass
 
+    # =====================================================
 
-# ======================================================
-# SERVICIO: RESERVA DE SALAS
-# ======================================================
+    @abstractmethod
+    def descripcion(self):
+        pass
 
-class SalaReuniones(Servicio):
+# =========================================================
+# CLASE RESERVA SALA
+# =========================================================
+
+class ReservaSala(Servicio):
 
     def __init__(
         self,
         nombre_servicio,
-        tarifa_base,
-        cantidad_horas
+        costo_base,
+        horas
     ):
 
         super().__init__(
             nombre_servicio,
-            tarifa_base
+            costo_base
         )
 
-        if cantidad_horas <= 0:
+        if horas <= 0:
 
             raise ErrorServicio(
                 "Las horas deben ser válidas."
             )
 
-        self.cantidad_horas = cantidad_horas
+        self.horas = horas
 
-    # ----------------------------------------------
+    # =====================================================
 
-    def calcular_valor(self):
+    def calcular_costo(self):
 
         return (
-            self.tarifa_base *
-            self.cantidad_horas
+            self.costo_base *
+            self.horas
         )
 
-    # ----------------------------------------------
-    # MÉTODO SOBRECARGADO
-    # ----------------------------------------------
+    # =====================================================
 
-    def calcular_valor_descuento(
+    def calcular_costo_descuento(
         self,
         descuento=0
     ):
 
         return (
-            self.calcular_valor() -
+            self.calcular_costo() -
             descuento
         )
 
-    # ----------------------------------------------
+    # =====================================================
 
-    def detalle_servicio(self):
+    def descripcion(self):
 
         return (
-            f"Sala reservada por "
-            f"{self.cantidad_horas} horas."
+            f"Reserva de sala por "
+            f"{self.horas} horas."
         )
 
+# =========================================================
+# CLASE ALQUILER EQUIPOS
+# =========================================================
 
-# ======================================================
-# SERVICIO: ALQUILER DE EQUIPOS
-# ======================================================
-
-class EquiposTecnologia(Servicio):
+class AlquilerEquipos(Servicio):
 
     def __init__(
         self,
         nombre_servicio,
-        tarifa_base,
-        dias_alquiler
+        costo_base,
+        dias
     ):
 
         super().__init__(
             nombre_servicio,
-            tarifa_base
+            costo_base
         )
 
-        if dias_alquiler <= 0:
+        if dias <= 0:
 
             raise ErrorServicio(
-                "Los días son inválidos."
+                "Los días deben ser válidos."
             )
 
-        self.dias_alquiler = dias_alquiler
+        self.dias = dias
 
-    # ----------------------------------------------
+    # =====================================================
 
-    def calcular_valor(self):
-
-        return (
-            self.tarifa_base *
-            self.dias_alquiler
-        )
-
-    # ----------------------------------------------
-
-    def detalle_servicio(self):
+    def calcular_costo(self):
 
         return (
-            f"Equipo alquilado por "
-            f"{self.dias_alquiler} días."
+            self.costo_base *
+            self.dias
         )
 
+    # =====================================================
 
-# ======================================================
-# SERVICIO: ASESORÍAS
-# ======================================================
+    def descripcion(self):
 
-class Consultoria(Servicio):
+        return (
+            f"Alquiler de equipos "
+            f"por {self.dias} días."
+        )
+
+# =========================================================
+# CLASE ASESORÍA ESPECIALIZADA
+# =========================================================
+
+class AsesoriaEspecializada(Servicio):
 
     def __init__(
         self,
         nombre_servicio,
-        tarifa_base,
-        categoria
+        costo_base,
+        nivel
     ):
 
         super().__init__(
             nombre_servicio,
-            tarifa_base
+            costo_base
         )
 
-        self.categoria = categoria
+        self.nivel = nivel
 
-    # ----------------------------------------------
+    # =====================================================
 
-    def calcular_valor(self):
+    def calcular_costo(self):
 
-        if self.categoria.lower() == "vip":
+        if self.nivel.lower() == "premium":
 
-            return self.tarifa_base * 2
+            return (
+                self.costo_base * 2
+            )
 
-        return self.tarifa_base
+        return self.costo_base
 
-    # ----------------------------------------------
+    # =====================================================
 
-    def detalle_servicio(self):
+    def descripcion(self):
 
         return (
-            f"Asesoría tipo "
-            f"{self.categoria}"
+            f"Asesoría especializada "
+            f"nivel {self.nivel}."
         )
